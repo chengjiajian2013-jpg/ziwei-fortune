@@ -336,60 +336,80 @@ function loadFortune(userId) {
   const card = document.getElementById('fortuneCard');
   card.innerHTML = '<div class="loading">正在计算运势...</div>';
 
-  try {
-    const user = USERS[userId];
-    const fortune = calculateFortune(user);
-    renderFortune(fortune);
-  } catch (error) {
-    console.error('[Ziwei Error]', error);
-    card.innerHTML = '<div class="error">计算失败，请刷新重试</div>';
-  }
+  // 等待 iztro 加载完成
+  setTimeout(() => {
+    try {
+      const user = USERS[userId];
+      const fortune = calculateFortune(user);
+      renderFortune(fortune);
+    } catch (error) {
+      console.error('[Ziwei Error]', error);
+      console.error('Error details:', error.message, error.stack);
+      card.innerHTML = `<div class="error">计算失败：${error.message}<br><small>请刷新页面重试</small></div>`;
+    }
+  }, 500);
 }
 
 // 计算运势（使用 iztro）
 function calculateFortune(user) {
-  // 使用 iztro 排盘
-  const astrolabe = window.iztro.astro.bySolar(
-    user.birthDate,
-    user.birthTime,
-    user.gender,
-    true,
-    'zh-CN'
-  );
+  // 检查 iztro 是否加载
+  if (!window.iztro || !window.iztro.astro) {
+    throw new Error('iztro 库未加载成功');
+  }
 
-  // 获取流年运势
-  const today = new Date();
-  const yearChart = astrolabe.horoscope(today.getFullYear(), today.getMonth() + 1);
+  console.log('Calculating fortune for:', user);
 
-  // 简化的运势分析（真实项目需要更复杂的逻辑）
-  const baseScore = Math.floor(Math.random() * 2) + 3; // 3-4基础分
+  try {
+    // 使用 iztro 排盘
+    const astrolabe = window.iztro.astro.bySolar(
+      user.birthDate,
+      user.birthTime,
+      user.gender,
+      true,
+      'zh-CN'
+    );
 
-  return {
-    user: user.name,
-    date: today.toISOString().split('T')[0],
-    career: {
-      score: baseScore,
-      text: '事业运势平稳，适合推进已有项目，保持稳扎稳打的节奏。今日宜专注手头工作，不宜冒进。'
-    },
-    wealth: {
-      score: baseScore + 1,
-      text: '财运较佳，可关注投资机会，但需谨慎评估风险。正财运稳定，偏财需谨慎。'
-    },
-    relationship: {
-      score: baseScore,
-      text: '感情运势平稳，注意沟通交流，多一些耐心和理解。单身者桃花运一般。'
-    },
-    health: {
-      score: 4,
-      text: '健康状况良好，注意作息规律，适当运动放松。注意消化系统保养。'
-    },
-    suggestions: [
-      '适合处理财务相关事项',
-      '午时运势较佳，重要决策可在此时进行',
-      '注意人际关系的维护，多与朋友交流',
-      '保持积极心态，遇到困难不要气馁'
-    ]
-  };
+    console.log('Astrolabe created:', astrolabe);
+
+    // 获取流年运势
+    const today = new Date();
+    const yearChart = astrolabe.horoscope(today.getFullYear(), today.getMonth() + 1);
+
+    console.log('Year chart created:', yearChart);
+
+    // 简化的运势分析（真实项目需要更复杂的逻辑）
+    const baseScore = Math.floor(Math.random() * 2) + 3; // 3-4基础分
+
+    return {
+      user: user.name,
+      date: today.toISOString().split('T')[0],
+      career: {
+        score: baseScore,
+        text: '事业运势平稳，适合推进已有项目，保持稳扎稳打的节奏。今日宜专注手头工作，不宜冒进。'
+      },
+      wealth: {
+        score: baseScore + 1,
+        text: '财运较佳，可关注投资机会，但需谨慎评估风险。正财运稳定，偏财需谨慎。'
+      },
+      relationship: {
+        score: baseScore,
+        text: '感情运势平稳，注意沟通交流，多一些耐心和理解。单身者桃花运一般。'
+      },
+      health: {
+        score: 4,
+        text: '健康状况良好，注意作息规律，适当运动放松。注意消化系统保养。'
+      },
+      suggestions: [
+        '适合处理财务相关事项',
+        '午时运势较佳，重要决策可在此时进行',
+        '注意人际关系的维护，多与朋友交流',
+        '保持积极心态，遇到困难不要气馁'
+      ]
+    };
+  } catch (error) {
+    console.error('iztro calculation error:', error);
+    throw new Error('排盘计算失败: ' + error.message);
+  }
 }
 
 // 渲染运势
