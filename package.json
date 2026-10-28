@@ -1,0 +1,16 @@
+{
+  "name": "ziwei-fortune",
+  "version": "1.0.0",
+  "description": "紫微斗数每日运势查询",
+  "main": "index.html",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy ."
+  },
+  "keywords": ["ziwei", "fortune", "astrology"],
+  "author": "Jian",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
