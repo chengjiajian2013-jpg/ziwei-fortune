@@ -371,11 +371,16 @@ function calculateFortune(user) {
 
     console.log('Astrolabe created:', astrolabe);
 
-    // 获取流年运势
+    // 获取今日日期（格式：YYYY-M-D）
     const today = new Date();
-    const yearChart = astrolabe.horoscope(today.getFullYear(), today.getMonth() + 1);
+    const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
-    console.log('Year chart created:', yearChart);
+    console.log('Getting horoscope for date:', dateStr);
+
+    // 获取流年流月流日运势
+    const horoscope = astrolabe.horoscope(dateStr);
+
+    console.log('Horoscope created:', horoscope);
 
     // 简化的运势分析（真实项目需要更复杂的逻辑）
     const baseScore = Math.floor(Math.random() * 2) + 3; // 3-4基础分
